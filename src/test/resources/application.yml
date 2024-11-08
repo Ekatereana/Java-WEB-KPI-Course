@@ -10,6 +10,10 @@ application:
   payment-service:
     base-path: http://localhost:8089
     payments: ${application.payment-service.base-path}/payment-service/v1/payments
+  feature:
+    toggles:
+      customer-greeting: false
+      feature: false
 
 tests:
   unit-tests:

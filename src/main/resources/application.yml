@@ -1,7 +1,8 @@
 spring:
+  profiles:
+    active: local
   application:
     name: space-cats-market
-
 application:
   greetings:
     dobby:
@@ -10,3 +11,15 @@ application:
   payment-service:
     base-path: http://localhost:8089
     payments: ${application.payment-service.base-path}/payment-service/v1/payments
+  feature:
+    toggles:
+      customer-greeting: true
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+application:
+  feature:
+    toggles:
+      customer-greeting: true

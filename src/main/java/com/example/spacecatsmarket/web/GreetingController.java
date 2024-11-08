@@ -2,6 +2,8 @@ package com.example.spacecatsmarket.web;
 
 import com.example.spacecatsmarket.config.GreetingProperties;
 import com.example.spacecatsmarket.config.GreetingProperties.CatGreeting;
+import com.example.spacecatsmarket.featuretoggle.FeatureToggles;
+import com.example.spacecatsmarket.featuretoggle.annotation.FeatureToggle;
 import com.example.spacecatsmarket.web.exception.CatNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ public class GreetingController {
     }
 
     @GetMapping("/{name}")
+    @FeatureToggle(FeatureToggles.CUSTOMER_GREETING)
     public ResponseEntity<String> getCustomerById(@PathVariable String name) {
         String greeting = ofNullable(greetingProperties.getGreetings()
             .get(name)).map(CatGreeting::getMessage).orElseThrow(() -> new CatNotFoundException(name));

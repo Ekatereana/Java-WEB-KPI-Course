@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.6'
     id 'org.barfuin.gradle.jacocolog' version '3.1.0'
+    id 'eclipse'
 }
 
 group = 'com.example'
@@ -38,6 +39,7 @@ apply from: "${rootProject.projectDir}/gradle/jacoco.gradle"
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'jakarta.validation:jakarta.validation-api:3.1.0'
     implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'

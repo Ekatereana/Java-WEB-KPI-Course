@@ -1,12 +1,15 @@
 package com.example.spacecatsmarket.web;
 
 import com.example.spacecatsmarket.domain.payment.PaymentTransaction;
+import com.example.spacecatsmarket.featuretoggle.exception.FeatureToggleNotEnabledException;
 import com.example.spacecatsmarket.service.exception.CustomerNotFoundException;
 import com.example.spacecatsmarket.service.exception.PaymentTransactionFailed;
 import com.example.spacecatsmarket.web.exception.CatNotFoundException;
 import com.example.spacecatsmarket.web.exception.ParamsViolationDetails;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -53,6 +56,15 @@ public class ExceptionTranslator extends ResponseEntityExceptionHandler {
         ProblemDetail problemDetail = forStatusAndDetail(BAD_REQUEST, ex.getMessage());
         problemDetail.setType(create("payment-refused"));
         problemDetail.setTitle("Payment Transaction Failed to process");
+        return problemDetail;
+    }
+
+    @ExceptionHandler(FeatureToggleNotEnabledException.class)
+    ProblemDetail handleFeatureToggleNotEnabledException(FeatureToggleNotEnabledException ex) {
+        log.info("Feature is not enabled");
+        ProblemDetail problemDetail = forStatusAndDetail(NOT_FOUND, ex.getMessage());
+        problemDetail.setType(create("feature-disabled"));
+        problemDetail.setTitle("Feature is disabled");
         return problemDetail;
     }
 
