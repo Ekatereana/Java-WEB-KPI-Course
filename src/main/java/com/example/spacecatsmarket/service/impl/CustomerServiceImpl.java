@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +45,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    @Transactional(propagation = Propagation.NESTED)
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public CustomerDetails createCustomerDetails(CustomerDetailsDto customerDetailsDto) {
         try {
             return customerDetailsMapper.toCustomerDetails(customerRepository.save(customerDetailsMapper.toCustomerEntity(customerDetailsDto)));

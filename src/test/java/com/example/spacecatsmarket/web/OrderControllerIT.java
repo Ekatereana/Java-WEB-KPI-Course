@@ -27,6 +27,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.example.spacecatsmarket.service.exception.PaymentTransactionFailed.PAYMENT_TRANSACTION_WITH_ID_S_FOR_CART_ID_S_FAILED;
@@ -36,6 +37,8 @@ import static org.mockito.Mockito.reset;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,7 +51,7 @@ class OrderControllerIT extends AbstractIt {
 
     private static final String CART_ID_1234 = "cartId1234";
     private final PlaceOrderRequestDto PLACE_ORDER_REQUEST_DTO = builPlaceOrderRequestDto();
-    private final String CUSTOMER_REFERENCE = "consumerReference";
+    private final String CUSTOMER_REFERENCE = UUID.randomUUID().toString();
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -69,6 +72,7 @@ class OrderControllerIT extends AbstractIt {
 
     @Test
     @SneakyThrows
+    @WithMockUser
     void shouldPlaceOrder() {
         UUID transaction = UUID.randomUUID();
 
@@ -81,8 +85,9 @@ class OrderControllerIT extends AbstractIt {
                     .status(PaymentStatus.SUCCESS)
                     .build()))));
 
-        mockMvc.perform(post("/api/v1/{customerReference}/orders/{cartId}", CUSTOMER_REFERENCE, "cartId1234").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/v1/internal/{customerReference}/orders/{cartId}", CUSTOMER_REFERENCE, "cartId1234").contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
+                .with(csrf())
                 .content(objectMapper.writeValueAsString(PLACE_ORDER_REQUEST_DTO)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.orderId").exists())
@@ -92,6 +97,7 @@ class OrderControllerIT extends AbstractIt {
     @ParameterizedTest
     @ValueSource(strings = {"123e4567-e89b-12d3-a456-426614174000", "223e4567-e89b-12d3-a456-426614174001"})
     @SneakyThrows
+    @WithMockUser
     void shouldPlaceOrder(UUID transaction) {
 
         stubFor(WireMock.post("/payment-service/v1/payments")
@@ -103,8 +109,9 @@ class OrderControllerIT extends AbstractIt {
                     .status(PaymentStatus.SUCCESS)
                     .build()))));
 
-        mockMvc.perform(post("/api/v1/{customerReference}/orders/{cartId}", CUSTOMER_REFERENCE, "cartId1234").contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/v1/internal/{customerReference}/orders/{cartId}", CUSTOMER_REFERENCE, "cartId1234").contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
+                .with(csrf())
                 .content(objectMapper.writeValueAsString(PLACE_ORDER_REQUEST_DTO)))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.orderId").exists())
@@ -113,6 +120,7 @@ class OrderControllerIT extends AbstractIt {
 
 
     @Test
+    @WithMockUser
     @SneakyThrows
     void shouldThrowPaymentTransactionFailedException() {
         UUID transaction = UUID.randomUUID();
@@ -130,8 +138,9 @@ class OrderControllerIT extends AbstractIt {
                     .status(PaymentStatus.FAILURE)
                     .build()))));
 
-        mockMvc.perform(post("/api/v1/{customerReference}/orders/{cartId}", CUSTOMER_REFERENCE, CART_ID_1234).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(post("/api/v1/internal/{customerReference}/orders/{cartId}", CUSTOMER_REFERENCE, CART_ID_1234).contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
+                .with(csrf())
                 .content(objectMapper.writeValueAsString(PLACE_ORDER_REQUEST_DTO)))
             .andExpect(status().isBadRequest())
             .andExpect(content().json(objectMapper.writeValueAsString(problemDetail)));

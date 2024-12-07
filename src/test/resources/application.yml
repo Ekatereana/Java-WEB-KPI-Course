@@ -1,6 +1,24 @@
 spring:
   application:
     name: space-cats-market
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jws-algorithms: RS256
+          jwk-set-uri: http://localhost:8089/.well-known/jwks.json
+      client:
+        github:
+          client-id: ${GITHUB_CLIENT_ID}
+          client-secret: ${GITHUB_CLIENT_SECRET}
+          scope: user:email
+          authorization-grant-type: authorization_code
+          redirect-uri: http://localhost:8080/login/oauth2/code/github"
+        provider:
+            github:
+              authorization-uri: https://github.com/login/oauth/authorize
+              token-uri: https://github.com/login/oauth/access_token
+              user-info-uri: https://api.github.com/user
   jpa:
     show-sql: true
     open-in-view: false
