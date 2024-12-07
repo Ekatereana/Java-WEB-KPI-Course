@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -30,6 +31,7 @@ class GreetingControllerIT extends AbstractIt {
 
     @Test
     @SneakyThrows
+    @WithMockUser
     @DisabledFeatureToggle(FeatureToggles.CUSTOMER_GREETING)
     void shouldGet404FeatureDisabled() {
         mockMvc.perform(get("/api/v1/greetings/{name}", DOBBY)).andExpect(status().isNotFound());

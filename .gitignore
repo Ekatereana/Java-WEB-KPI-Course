@@ -68,3 +68,5 @@ $RECYCLE.BIN/
 
 # Node
 node_modules/
+
+*.pem

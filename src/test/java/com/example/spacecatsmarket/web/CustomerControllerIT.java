@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.reset;
@@ -44,10 +45,11 @@ class CustomerControllerIT extends AbstractIt {
     }
 
     @Test
+    @WithMockUser(roles = "COSMO_ADMIN")
     @SneakyThrows
     void shouldGetAllCustomers() {
         saveCustomerEntity();
-        mockMvc.perform(get("/api/v1/customers"))
+        mockMvc.perform(get("/api/v1/admin/customers"))
             .andExpect(status().isOk());
 
     }

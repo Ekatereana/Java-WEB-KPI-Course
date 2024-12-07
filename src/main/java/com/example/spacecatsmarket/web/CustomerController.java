@@ -7,6 +7,7 @@ import com.example.spacecatsmarket.service.mapper.CustomDetailsMapper;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +21,7 @@ import static org.springframework.http.ResponseEntity.noContent;
 
 @RestController
 @Validated
-@RequestMapping("/api/v1/customers")
+@RequestMapping("/api/v1/admin/customers")
 public class CustomerController {
 
     private final CustomerService customerService;
@@ -31,6 +32,7 @@ public class CustomerController {
         this.customDetailsMapper = customDetailsMapper;
     }
 
+    @PreAuthorize("hasRole('COSMO_ADMIN')")
     @GetMapping
     public ResponseEntity<CustomerDetailsListDto> getAllCustomers() {
         return ResponseEntity.ok(customDetailsMapper.toCustomerDetailsListDto(customerService.getAllCustomerDetails()));

@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @Validated
-@RequestMapping("/api/v1/{customerReference}/orders")
+@RequestMapping("/api/v1/internal/{customerReference}/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
